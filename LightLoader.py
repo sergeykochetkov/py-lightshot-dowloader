@@ -47,23 +47,25 @@ class LightLoader(threading.Thread):
     # - Looks for raw image link in HTML File
     def generateImgur(self, url, fileName):
         soup = BeautifulSoup(self.generateHtml(fileName), 'html.parser')
-        imgUrl = soup.find('img', id='screenshot-image')['src']
-        
-        # - Prevents "Error Image" From being downloaded
-        if imgUrl != '//st.prntscr.com/2018/06/19/0614/img/0_173a7b_211be8ff.png':
-            imgUrl = imgUrl.replace('//st.', 'http://st.') if imgUrl.startswith('//st.') else imgUrl
-            
-            global DLCOUNT
-            DLCOUNT += 1
+        imgUrl = soup.find('img', id='screenshot-image')
 
-            print("Prepare to download: " + imgUrl)
-            archive_path = DIRNAME + "/" + fileName + ".png"
+        if imgUrl is not None:
+            imgUrl = imgUrl['src']
+            # - Prevents "Error Image" From being downloaded
+            if imgUrl != '//st.prntscr.com/2018/06/19/0614/img/0_173a7b_211be8ff.png':
+                imgUrl = imgUrl.replace('//st.', 'http://st.') if imgUrl.startswith('//st.') else imgUrl
 
-            with open(archive_path, 'wb') as f:
-                f.write(requests.get(imgUrl, headers={'User-Agent': 'Mozilla/5.0'}).content)
-                
-            print("File: " + fileName + " - Saved to " + DIRNAME + " folder.  ")
-            print("Total Downloads: " + str(DLCOUNT))
+                global DLCOUNT
+                DLCOUNT += 1
+
+                print("Prepare to download: " + imgUrl)
+                archive_path = DIRNAME + "/" + fileName + ".png"
+
+                with open(archive_path, 'wb') as f:
+                    f.write(requests.get(imgUrl, headers={'User-Agent': 'Mozilla/5.0'}).content)
+
+                print("File: " + fileName + " - Saved to " + DIRNAME + " folder.  ")
+                print("Total Downloads: " + str(DLCOUNT))
 
         else:
             global ERCOUNT
